@@ -1,0 +1,25 @@
+<template>
+  <figure v-if="show" class="demo">
+    <img :src=img class="demo__picture">
+    <figcaption  class="demo__text">{{
+foo.b ? `a${b}` : 'c'
+}}</figcaption>
+  </figure>
+</template>
+
+<script>
+export default {
+  data() {
+    return {show: true, img: 'https://www.example.com', foo:{}}
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.demo {
+color: #fff;
+&__picture {
+display: block;
+}
+}
+</style>
