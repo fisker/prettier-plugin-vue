@@ -13,7 +13,7 @@ module.exports = {
   parserOptions: {},
   extends: ['@fisker'],
   settings: {},
-  rules: {},
+  rules: {'class-methods-use-this': 'off'},
   plugins: [],
   globals: {},
   overrides: [],

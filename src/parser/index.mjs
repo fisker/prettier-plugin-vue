@@ -8,9 +8,21 @@ const options = {
 function parse(text) {
   const result = parseForESLint(text, options)
   const document = result.services.getDocumentFragment()
-  // I don't like options.originalText
-  document.originalText = text
-  return document
+  const [error] = document.errors
+  if (error) {
+    const {message, lineNumber, column} = error
+    const parseError = new SyntaxError(message)
+    parseError.loc = {
+      start: {line: lineNumber, column: column + 1},
+    }
+    throw parseError
+  }
+
+  return {
+    result,
+    document,
+    text,
+  }
 }
 
 export default {
