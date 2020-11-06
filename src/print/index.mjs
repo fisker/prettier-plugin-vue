@@ -116,30 +116,25 @@ class VuePrinter {
 
   *VElement(node) {
     const {startTag, endTag, name, children} = node
-    yield* this.print(startTag)
-
+    const parts = [concat([...this.print(startTag)])]
     if (node.children.length === 1 && name === 'style') {
-      yield hardline
-      yield formatStyle(node.children[0].value)
+      parts.push(line, formatStyle(node.children[0].value))
     } else if (node.children.length === 1 && name === 'script') {
-      yield hardline
-      yield formatScript(node.children[0].value)
+      parts.push(line, formatScript(node.children[0].value))
     } else {
       for (const child of children) {
         if (child.type === 'VText') {
-          yield child.value.trim()
+          parts.push(child.value.trim())
         } else if (child.type === 'VElement') {
-          yield softline
-          const element = concat([line, ...this.print(child)])
-          yield indent(group(element))
+          const element = concat([hardline, ...this.print(child)])
+          parts.push(indent(element))
         } else {
-          yield softline
-          yield* this.print(child)
+          parts.push(concat([...this.print(child)]))
         }
       }
     }
-    yield softline
-    yield* this.print(endTag)
+    parts.push(softline, ...this.print(endTag))
+    yield group(concat(parts))
   }
 
   *VText(node) {
@@ -150,7 +145,6 @@ class VuePrinter {
     const {name} = node.parent
 
     const parts = ['<', name]
-    const printedAttributes = []
     for (const attribute of node.attributes) {
       parts.push(line, ...this.print(attribute))
     }
@@ -178,6 +172,7 @@ class VuePrinter {
   *VExpressionContainer(node) {
     if (node.parent.type === 'VElement') {
       yield '{{'
+      yield line
     }
     if (
       node.expression.type === 'VOnExpression' ||
@@ -188,6 +183,7 @@ class VuePrinter {
       yield printESTree(node.expression, {text: this.text})
     }
     if (node.parent.type === 'VElement') {
+      yield line
       yield '}}'
     }
   }

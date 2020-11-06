@@ -1,0 +1,49 @@
+<template>
+  <div
+    class="demo-block"
+    :class="[blockClass, { 'hover': hovering }]"
+    @mouseenter="hovering = true"
+    @mouseleave="hovering = false">
+    <div class="source">
+      <slot name="source"></slot>
+    </div>
+    <div class="meta" ref="meta">
+      <div class="description" v-if="$slots.default">
+        <slot></slot>
+      </div>
+      <div class="highlight">
+        <slot name="highlight"></slot>
+      </div>
+    </div>
+    <div
+      class="demo-block-control"
+      ref="control"
+      :class="{ 'is-fixed': fixedControl }"
+      @click="isExpanded = !isExpanded">
+      <transition name="arrow-slide">
+        <i :class="[iconClass, { 'hovering': hovering }]"></i>
+      </transition>
+      <transition name="text-slide">
+        <span v-show="hovering">{{ controlText }}</span>
+      </transition>
+      <el-tooltip effect="dark" :content="langConfig['tooltip-text']" placement="right">
+        <transition name="text-slide">
+          <el-button
+            v-show="hovering || isExpanded"
+            size="small"
+            type="text"
+            class="control-button"
+            @click.stop="goCodepen">
+            {{ langConfig['button-text'] }}
+          </el-button>
+        </transition>
+      </el-tooltip>
+    </div>
+  </div>
+</template>
+
+<style lang="scss">
+</style>
+
+<script type="text/babel">
+</script>
