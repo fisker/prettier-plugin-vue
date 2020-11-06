@@ -27,6 +27,9 @@ const {
 } = prettierDocument.builders
 const {stripTrailingHardline} = prettierDocument.utils
 
+let i = 0
+const uid = () => (i += 1)
+
 const removeParent = (node) => {
   if (Array.isArray(node)) {
     return node.map((node) => removeParent(node))
@@ -94,6 +97,8 @@ class VuePrinter {
     return concat([...result])
   }
 
+  isRootBlock(node) {}
+
   *print(node) {
     if (!node) {
       return
@@ -143,25 +148,15 @@ class VuePrinter {
 
   *VStartTag(node) {
     const {name} = node.parent
-    yield '<'
-    yield name
+
+    const parts = ['<', name]
     const printedAttributes = []
     for (const attribute of node.attributes) {
-      printedAttributes.push(concat([line, ...this.print(attribute)]))
+      parts.push(line, ...this.print(attribute))
     }
-    const d = ifBreak(
-      indent(concat(printedAttributes)),
-      concat(printedAttributes)
-    )
-
-    yield d
-    yield indent(
-      concat([
-        hardline,
-        node.selfClosing && !isHTMLVoidElement(name) ? '/' : '',
-        '>',
-      ])
-    )
+    const closing = node.selfClosing && !isHTMLVoidElement(name) ? '/>' : '>'
+    parts.push(closing)
+    yield group(concat([ifBreak(indent(concat(parts)), concat(parts))]))
   }
 
   *VAttribute(node) {
